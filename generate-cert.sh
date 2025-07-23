@@ -1,17 +1,23 @@
-#!/bin/sh
+#!/bin/bash
 
-# Definir los parámetros del certificado
-CERT_DIR="/certs"
-IP="127.0.0.1"
-EXPIRATION_DAYS=365
+set -e
 
-# Crear un certificado SSL autofirmado
-openssl req -x509 -nodes -days $EXPIRATION_DAYS -newkey rsa:2048 \
-    -keyout $CERT_DIR/server.key -out $CERT_DIR/server.crt \
-    -subj "/C=US/ST=State/L=City/O=LocalOrg/OU=IT Department/CN=$IP"
+CERT_DIR="/app/certs"
 
-# Mostrar los certificados generados
-echo "Certificado y clave generados:"
-echo "Certificado: $CERT_DIR/server.crt"
-echo "Clave privada: $CERT_DIR/server.key"
+echo "📁 Creando carpeta de certificados: $CERT_DIR"
+mkdir -p "$CERT_DIR"
+
+echo "🔐 Instalando autoridad certificadora local"
+mkcert -install
+
+echo "📜 Generando certificados para documentos-sg.test, localhost, 127.0.0.1"
+mkcert -key-file "$CERT_DIR/server.key" -cert-file "$CERT_DIR/server.crt" 128.5.101.69 localhost 127.0.0.1
+
+# Copiar la CA raíz al directorio compartido para que esté disponible en el host
+CA_PATH="$(mkcert -CAROOT)/rootCA.pem"
+echo "📄 Copiando CA raíz desde $CA_PATH a $CERT_DIR/rootCA.pem"
+cp "$CA_PATH" "$CERT_DIR/rootCA.pem"
+
+echo "✅ Certificados y CA copiados:"
+ls -l "$CERT_DIR"
 
