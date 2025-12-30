@@ -11,7 +11,7 @@ echo "🔐 Instalando autoridad certificadora local"
 mkcert -install
 
 echo "📜 Generando certificados para documentos-sg.test, localhost, 127.0.0.1"
-mkcert -key-file "$CERT_DIR/server.key" -cert-file "$CERT_DIR/server.crt" 128.5.101.69 localhost 127.0.0.1
+mkcert -key-file "$CERT_DIR/server.key" -cert-file "$CERT_DIR/server.crt" "*.test" localhost 127.0.0.1
 
 # Copiar la CA raíz al directorio compartido para que esté disponible en el host
 CA_PATH="$(mkcert -CAROOT)/rootCA.pem"
